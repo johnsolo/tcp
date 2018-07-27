@@ -1,4 +1,8 @@
 #include <UIPEthernet.h>
+#define relay1 5
+#define relay1 6
+#define relay1 7
+#define relay1 8
 
 EthernetClient client;
 unsigned long startMillis;  //some global variables available anywhere in the program
@@ -7,11 +11,12 @@ const unsigned long period = 5000;  //the value is a number of milliseconds
 
 
 void setup() {
-
+  pinMode(relay,OUTPUT);
   Serial.begin(9600);
 
   uint8_t mac[6] = {0x00,0x01,0x02,0x03,0x04,0x05};
   Ethernet.begin(mac);
+ 
 
   Serial.print("localIP: ");
   Serial.println(Ethernet.localIP());
@@ -33,10 +38,8 @@ while(1)
         }
          else
         Serial.println("Client connect failed");
+        delay(500);
 }
-  
-
-
 }
 
 void loop() {
@@ -44,7 +47,7 @@ long int initial,final;
 currentMillis = millis();
       while(currentMillis - startMillis >= period)
       {
-          client.println("DATA from Client");
+          client.println("D");
           startMillis = currentMillis; 
          
       }
@@ -54,11 +57,19 @@ currentMillis = millis();
               uint8_t* msg = (uint8_t*)malloc(size);
               size = client.read(msg,size);
               Serial.write(msg,size);
+              Serial.print("msg");
+              Serial.println(*msg);
+              if(*msg==49)
+              {
+                Serial.println("ON");
+                digitalWrite(relay,HIGH);
+              }
+              else if(*msg==48)
+              {
+                Serial.println("off");
+                digitalWrite(relay,LOW);
+              }
               free(msg);
             }
-         //client.stop();
-         //delay(1000);
         }
      
-    
-
